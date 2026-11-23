@@ -1,0 +1,71 @@
+# Every hour: read John Doe's events from go-out, update the ticket buttons, publish the page.
+# Also publishes right away whenever the page itself is changed.
+name: Update events and publish
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 * * * *" # every hour, at minute 17
+  workflow_dispatch: # "Run workflow" button in GitHub
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      publish: ${{ steps.save.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install image tool (shrinks the posters)
+        run: python -m pip install --quiet pillow
+
+      - name: Read events and posters from go-out
+        run: python scripts/update_events.py
+
+      - name: Save the new events (only if something changed)
+        id: save
+        run: |
+          git add -A site
+          if git diff --cached --quiet; then
+            echo "Events unchanged."
+            if [ "${{ github.event_name }}" = "schedule" ]; then echo "publish=false" >> "$GITHUB_OUTPUT"; else echo "publish=true" >> "$GITHUB_OUTPUT"; fi
+          else
+            git config user.name "events-bot"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "Update events from go-out"
+            git push
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.save.outputs.publish == 'true'
+        uses: actions/configure-pages@v6
+
+      - if: steps.save.outputs.publish == 'true'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    if: needs.build.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

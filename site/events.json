@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1794481386501",
+    "title": "Monday | John Doe",
+    "night": "2026-11-23",
+    "date": "23.11",
+    "time": "22:30",
+    "start": "2026-11-23T22:30:00+02:00",
+    "end": "2026-11-24T06:00:00+02:00",
+    "url": "https://www.go-out.co/event/1794481386501?ref=a39f22233",
+    "poster": "https://images.go-out.co/events/6af59cea3fb2f607d939cf8f1794481511047_coverImage.jpg",
+    "thumb": "assets/events/1794481386501-1794481511047.jpg"
+  },
+  {
+    "id": "1794481223084",
+    "title": "Tuesday | John Doe",
+    "night": "2026-11-24",
+    "date": "24.11",
+    "time": "22:30",
+    "start": "2026-11-24T22:30:00+02:00",
+    "end": "2026-11-25T06:00:00+02:00",
+    "url": "https://www.go-out.co/event/1794481223084?ref=a39f22233",
+    "poster": "https://images.go-out.co/events/6af59c476d256307c22600f81794481359231_coverImage.jpg",
+    "thumb": "assets/events/1794481223084-1794481359231.jpg"
+  },
+  {
+    "id": "1794481225894",
+    "title": "Wednesday | John Doe",
+    "night": "2026-11-25",
+    "date": "25.11",
+    "time": "23:00",
+    "start": "2026-11-25T23:00:00+02:00",
+    "end": "2026-11-26T05:00:00+02:00",
+    "url": "https://www.go-out.co/event/1794481225894?ref=a39f22233",
+    "poster": "https://images.go-out.co/events/6af59c493af00807c4545d1b1794481563612_coverImage.jpg",
+    "thumb": "assets/events/1794481225894-1794481563612.jpg"
+  },
+  {
+    "id": "1794481230530",
+    "title": "Thursday | John Doe",
+    "night": "2026-11-26",
+    "date": "26.11",
+    "time": "22:30",
+    "start": "2026-11-26T22:30:00+02:00",
+    "end": "2026-11-27T05:00:00+02:00",
+    "url": "https://www.go-out.co/event/1794481230530?ref=a39f22233",
+    "poster": "https://images.go-out.co/events/6af59c4e3af00807c4545d211794481640357_coverImage.jpg",
+    "thumb": "assets/events/1794481230530-1794481640357.jpg"
+  },
+  {
+    "id": "1794481235733",
+    "title": "Saturday | John Doe",
+    "night": "2026-11-28",
+    "date": "28.11",
+    "time": "22:30",
+    "start": "2026-11-28T22:30:00+02:00",
+    "end": "2026-11-29T07:00:00+02:00",
+    "url": "https://www.go-out.co/event/1794481235733?ref=a39f22233",
+    "poster": "https://images.go-out.co/events/6af59c533af00807c4545d271794481698651_coverImage.jpg",
+    "thumb": "assets/events/1794481235733-1794481698651.jpg"
+  }
+]
