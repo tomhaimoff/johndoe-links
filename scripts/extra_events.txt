@@ -1,0 +1,6 @@
+# Extra go-out events to show on the page, one link per line.
+# Use this only for events that don't appear on https://go-out.co/venue/john-doe
+# (for example a duplicated event whose address wasn't re-picked from the list).
+# Past events disappear from the page by themselves, so old lines are harmless.
+
+https://www.go-out.co/event/1795511673024   # Friday 27.11

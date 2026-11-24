@@ -6,6 +6,8 @@ Runs every hour on GitHub (see .github/workflows/deploy.yml), and can be run by 
     python3 scripts/update_events.py          # update site/index.html, site/events.json, poster thumbnails
     python3 scripts/update_events.py --check  # only print what it found, change nothing
 
+Events that go-out doesn't show on the venue page can be added by link in scripts/extra_events.txt.
+
 If go-out can't be read, the script exits with an error and leaves the page as it was,
 so the last working ticket buttons stay up.
 """
@@ -25,6 +27,7 @@ from zoneinfo import ZoneInfo
 VENUE_URL = "https://go-out.co/venue/john-doe"
 EVENT_URL = "https://www.go-out.co/event/{id}?ref=a39f22233"  # ref = go-out referral code from the old Linktree
 POSTER_URL = "https://images.go-out.co/events/{oid}{ts}_coverImage.jpg"
+EVENT_PAGE = "https://go-out.co/event/{id}"
 TZ = ZoneInfo("Asia/Jerusalem")
 THUMB_PX = 144  # shown at 48px, sharp on 3x phone screens
 
@@ -32,6 +35,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
 INDEX = SITE / "index.html"
 EVENTS_JSON = SITE / "events.json"
+EXTRA = ROOT / "scripts" / "extra_events.txt"
 THUMBS = SITE / "assets" / "events"
 FALLBACK_THUMB = "assets/logo.jpg"
 START_MARK, END_MARK = "<!-- EVENTS:START -->", "<!-- EVENTS:END -->"
@@ -53,15 +57,39 @@ def parse_local(value: str) -> datetime:
     return datetime.strptime(value, "%Y-%m-%dT%H:%M:%S").replace(tzinfo=TZ)
 
 
-def read_events(page: str) -> list:
+def page_props(page: str) -> dict:
     m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', page, re.S)
     if not m:
         raise RuntimeError("go-out page changed: no __NEXT_DATA__ block")
-    data = json.loads(m.group(1))
-    raw = data.get("props", {}).get("pageProps", {}).get("events")
+    return json.loads(m.group(1)).get("props", {}).get("pageProps", {})
+
+
+def venue_events(page: str) -> list:
+    raw = page_props(page).get("events")
     if not isinstance(raw, list):
         raise RuntimeError("go-out page changed: no events list")
+    return raw
 
+
+def extra_events() -> list:
+    """Events listed by hand in scripts/extra_events.txt (ones go-out forgot to show on the venue page)."""
+    if not EXTRA.exists():
+        return []
+    raw = []
+    for line in EXTRA.read_text(encoding="utf-8").splitlines():
+        m = re.search(r"/event/(\d{6,20})", line.split("#", 1)[0])
+        if not m:
+            continue
+        try:  # a deleted or broken event shouldn't break the page
+            ev = page_props(fetch(EVENT_PAGE.format(id=m.group(1))).decode("utf-8")).get("event")
+            if isinstance(ev, dict) and ev.get("Active", True):
+                raw.append(ev)
+        except Exception as exc:
+            print(f"WARNING: could not read extra event {m.group(1)}: {exc}", file=sys.stderr)
+    return raw
+
+
+def read_events(raw: list) -> list:
     now = datetime.now(TZ)
     events, seen = [], set()
     for ev in raw:
@@ -79,7 +107,8 @@ def read_events(page: str) -> list:
         events.append(
             {
                 "id": event_id,
-                "title": " ".join(str(ev.get("Title", "")).split()),
+                # " ".join tidies spaces; the sub turns a typed "Friday I John Doe" into "Friday | John Doe"
+                "title": re.sub(r"^(\w+day) I ", r"\1 | ", " ".join(str(ev.get("Title", "")).split())),
                 "night": night.isoformat(),
                 "date": f"{night.day}.{night.month}",
                 "time": start.strftime("%H:%M"),
@@ -161,7 +190,7 @@ def render(events: list) -> str:
 def main() -> int:
     check_only = "--check" in sys.argv
     try:
-        events = read_events(fetch(VENUE_URL).decode("utf-8"))
+        events = read_events(venue_events(fetch(VENUE_URL).decode("utf-8")) + extra_events())
     except Exception as exc:  # leave the page untouched
         print(f"ERROR: could not read events from go-out: {exc}", file=sys.stderr)
         return 1
