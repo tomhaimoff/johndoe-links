@@ -1,17 +1,5 @@
 [
   {
-    "id": "1794481230530",
-    "title": "Thursday | John Doe",
-    "night": "2026-11-26",
-    "date": "26.11",
-    "time": "22:30",
-    "start": "2026-11-26T22:30:00+02:00",
-    "end": "2026-11-27T05:00:00+02:00",
-    "url": "https://www.go-out.co/event/1794481230530?ref=a39f22233",
-    "poster": "https://images.go-out.co/events/6af59c4e3af00807c4545d211794481640357_coverImage.jpg",
-    "thumb": "assets/events/1794481230530-1794481640357.jpg"
-  },
-  {
     "id": "1795511673024",
     "title": "Friday | John Doe",
     "night": "2026-11-27",
